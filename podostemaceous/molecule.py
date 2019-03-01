@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import sqrt, pi
-from constants import kB
+from podostemaceous.constants import kB
 
 class DSMCMolecule():
     
