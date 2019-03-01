@@ -1,5 +1,7 @@
-# podostemaceous
-A python module for computing some characteristics of DSMC simulations and the particles in them.
+podostemaceous
+==============
+
+A python module for computing some characteristics of Direct Simulation Monte Carlo (DSMC) simulations and the particles in them.
 
 `Podostemaceae <https://en.wikipedia.org/wiki/Podostemaceae>`_ is a family of river weeds.
 
@@ -8,6 +10,6 @@ A python module for computing some characteristics of DSMC simulations and the p
    :width: 50px
    :alt: Image of Mourera fluviatilis, from wikipedia
 
-Allows generation of VHS or VSS models from transport data.
+Allows generation of VHS or VSS models from transport data (viscosity and/or self-diffusion as a function of temperature).
 
-Allows estimates of errors in computed properties due to Δx, Δt, and N_c.
+Allows estimates of errors in computed transport properties due to Δx, Δt, and N_c.
