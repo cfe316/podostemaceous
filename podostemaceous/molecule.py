@@ -27,6 +27,51 @@ class VSSMolecule(DSMCMolecule):
         self.t_ref = t_ref
         self.alpha = alpha
 
+    def softness_coefficient_viscosity(self):
+        """
+        Softness coefficient for viscosity.
+
+        $S_\eta = 6 \alpha / ((\alpha + 1)(\alpha + 2))$
+
+        Koura, Katsuhisa, and Hiroaki Matsumoto.
+        "Variable Soft Sphere Molecular Model 
+        for Inverse‐power‐law or Lennard‐Jones Potential."
+        Physics of Fluids A: Fluid Dynamics 3, no. 10 (October 1991): 2459–65.
+        https://doi.org/10.1063/1.858184.
+
+        Equation (19)
+        """
+        a = self.alpha
+        return 6 * a / ((a + 1) * (a+2))
+
+    def mean_free_path(self, n, T):
+        """
+        Mean free path (viscosity).
+
+        Parameters:
+            n: density in #/m^3
+            T: temperature in Kelvin
+
+        Returns:
+            Mean free path in meters
+
+        References:
+
+        Bird 2013, Ch 2, Eq 34.
+        -and-
+        Koura, Katsuhisa, and Hiroaki Matsumoto.
+        "Variable Soft Sphere Molecular Model 
+        for Inverse‐power‐law or Lennard‐Jones Potential."
+        Physics of Fluids A: Fluid Dynamics 3, no. 10 (October 1991): 2459–65.
+        https://doi.org/10.1063/1.858184.
+
+        Equation (25)
+        """
+        lambda_VHS = 1 / (sqrt(2) * pi * self.d_ref **2 
+                        * n * (self.t_ref / T) ** (self.omega - 0.5))
+        lambda_VSS = lambda_0 * self.softness_coefficient_viscosity()
+        return lambda_VSS
+
     def schmidt_number(self):
         """
         Solved from Bird 2013, Ch 3, Equation 21.
@@ -63,7 +108,7 @@ class VHSMolecule(VSSMolecule):
 
     def mean_free_path(self, n, T):
         """
-        Mean free path of a VHS molecule.
+        (Viscosity) mean free path of a VHS molecule.
 
         Bird 2013, Ch 2, Eq 34.
         """
