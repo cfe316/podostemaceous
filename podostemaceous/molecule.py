@@ -72,6 +72,9 @@ class VSSMolecule(DSMCMolecule):
         lambda_VSS = lambda_VHS * self.softness_coefficient_viscosity()
         return lambda_VSS
 
+    def mean_free_time(self, n, t_k):
+        return self.mean_free_path(n, t_k) / self.most_probable_speed(t_k)  
+
     def schmidt_number(self):
         """
         Solved from Bird 2013, Ch 3, Equation 21.
@@ -115,9 +118,6 @@ class VHSMolecule(VSSMolecule):
         lambda_0 = 1 / (sqrt(2) * pi * self.d_ref **2 
                         * n * (self.t_ref / T) ** (self.omega - 0.5))
         return lambda_0
-
-    def mean_free_time(self, n, t_k):
-        return self.mean_free_path(n, t_k) / self.most_probable_speed(t_k)  
 
     def conductivity(self, T):
         """
