@@ -69,7 +69,7 @@ class VSSMolecule(DSMCMolecule):
         """
         lambda_VHS = 1 / (sqrt(2) * pi * self.d_ref **2 
                         * n * (self.t_ref / T) ** (self.omega - 0.5))
-        lambda_VSS = lambda_0 * self.softness_coefficient_viscosity()
+        lambda_VSS = lambda_VHS * self.softness_coefficient_viscosity()
         return lambda_VSS
 
     def schmidt_number(self):
