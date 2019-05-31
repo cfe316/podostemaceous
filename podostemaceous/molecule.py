@@ -27,6 +27,9 @@ class VSSMolecule(DSMCMolecule):
         self.t_ref = t_ref
         self.alpha = alpha
 
+    def __str__(self):
+        return str(self.__dict__)
+
     def softness_coefficient_viscosity(self):
         """
         Softness coefficient for viscosity.
