@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import pi
+from numpy import pi, sqrt
 
 def K_wall_discretization_error(dt, dx, n_c):
     """
@@ -11,7 +11,7 @@ def K_wall_discretization_error(dt, dx, n_c):
         n_c: particles per cell
     
     Returns:
-        K_wall / K
+        K_wall(dt, dx, n_c) / K(0, 0, infty)
 
     Rader, D. J., M. A. Gallis, J. R. Torczynski, and W. Wagner.
     “Direct Simulation Monte Carlo Convergence Behavior of
@@ -36,6 +36,54 @@ def K_wall_discretization_error(dt, dx, n_c):
                    + (1 / n_c ** 2) * 0.95 * dt ** 2
                    )
     return ratio
+
+def viscosity_discretization_error_conservative(dt, dx, n_c):
+    """
+    Conservative estimate: 2.5 * error in K(dt, dx, n_c)
+
+    The exact expressions for viscosity error due to dt and dx 
+    have coefficients that are 2.25 (dt) and 2.5 (dx) times larger than 
+    the coefficients in the thermal conductivity errors.
+    Thus, I conservatively estimate that the whole error 
+    (including with the n_c term) is 2.5 times larger.
+
+    Parameters:
+        dt: normalized timestep
+        dx: normalized cell size
+        n_c: particles per cell
+
+    Returns:
+        viscosity(dt, dx, n_c) / viscosity(0, 0, infty)
+
+ 
+    See the function K_wall_discretization_error.
+    """
+    k_err_ratio = K_wall_discretization_error(dt, dx, n_c)
+    visc_err_ratio = 1 + (k_err_ratio - 1) * 2.5
+    return visc_err_ratio
+
+def viscosity_discretization_error_less_conservative(dt, dx, n_c):
+    """
+    Less conservative estimate: error ratio = K(dt * \sqrt{2.25}, dx * \sqrt{2.5}, n_c)
+
+    The exact expressions for viscosity error due to dt and dx 
+    have coefficients that are 2.25 (dt) and 2.5 (dx) times larger than 
+    the coefficients in the thermal conductivity errors.
+    If we assume that the n_c term has unchanged scaling, then we can reuse 
+    the K_wall error ratio.
+
+    Parameters:
+        dt: normalized timestep
+        dx: normalized cell size
+        n_c: particles per cell
+
+    Returns:
+        viscosity(dt, dx, n_c) / viscosity(0, 0, infty)
+
+    See the function K_wall_discretization_error.
+    """
+    visc_err_ratio = K_wall_discretization_error(sqrt(2.25) * dt, sqrt(2.5) * dx, n_c)
+    return visc_err_ratio
 
 def viscosity_error_timestep(dt):
     """
