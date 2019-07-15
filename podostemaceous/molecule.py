@@ -17,6 +17,117 @@ class DSMCMolecule():
     def rms_speed(self, t_k):
         return sqrt(3 * kB * t_k / self.mass)
 
+class LennardJonesMolecule(DSMCMolecule):
+    
+    def __init__(self, name, mass, sigma, epsilon_Kelvin, m=12, n=6):
+        super().__init__(name, mass, sigma)
+        self.sigma = sigma
+        self.epsilon_Kelvin = epsilon_Kelvin
+        self.m = m
+        self.n = n
+        if (m != 12 or n != 6):
+            raise ValueError("Only 12-6 Lennard-Jones has been implemented!")
+
+    def _OmegaDiffusion(self, Tstar):
+        """
+        Collision integral for diffusion at a reduced temperature.
+
+        Parameters: T* is the reduced temperature kT/eps_{AB}
+        
+        \Omega_D(T*) as given in Equation (11-3.4) of
+            Reid, R.C., Prausnitz, J.M., Poling, B.E.,
+            The Properties of Gases and Liquids 4th ed.
+            (McGraw-Hill, New-York, 1987)
+        which is \Omega^(1,1) as given in 
+            Neufeld, Philip D., A. R. Janzen, and R. A. Aziz.
+            “Empirical Equations to Calculate 16 of the Transport Collision 
+            Integrals Ω(l, s)* for the Lennard‐Jones (12–6) Potential.”
+            The Journal of Chemical Physics 57,
+            no. 3 (August 1972): 1100–1102.
+            https://doi.org/10.1063/1.1678363.
+        """
+        T = Tstar
+        A = 1.06036
+        B = 0.15610
+        C = 0.19300
+        D = 0.47635
+        E = 1.03587
+        F = 1.52996
+        G = 1.76474
+        H = 3.89411
+        omd = A * T ** (-B) + C * np.exp(-T*D) + E * np.exp(-T*F) + G * np.exp(-T*H)
+        return omd
+
+    def _OmegaViscosity(self, Tstar):
+        """
+        Collision integral for viscosity at a reduced temperature.
+
+        Parameters: T* is the reduced temperature kT/eps_{AB}
+
+        References:
+        Reid, R.C., Prausnitz, J.M., Poling, B.E.,
+        The Properties of Gases and Liquids 4th ed.
+        (McGraw-Hill, New-York, 1987)
+
+        \Omega_ν(T*), Equation (9-4.3)
+
+        Neufeld, Philip D., A. R. Janzen, and R. A. Aziz.
+        “Empirical Equations to Calculate 16 of the Transport Collision 
+        Integrals Ω(l, s)* for the Lennard‐Jones (12–6) Potential.”
+        The Journal of Chemical Physics 57,
+        no. 3 (August 1972): 1100–1102.
+        https://doi.org/10.1063/1.1678363.
+
+        \Omega^(2,2), Table I.
+        """
+        T = Tstar
+        A = 1.16145
+        B = 0.14874
+        C = 0.52487
+        D = 0.77320
+        E = 2.16178
+        F = 2.43787
+        omv = A * T ** (-B) + C * np.exp(-T*D) + E * np.exp(-T*F)
+        return omv
+
+    def viscosity(self, T):
+        """
+        Viscosity as a function of temperature.
+
+        Reid, R.C., Prausnitz, J.M., Poling, B.E.,
+        The Properties of Gases and Liquids 4th ed.
+        (McGraw-Hill, New-York, 1987)
+
+        η(T), Equation (9-3.9)
+        """
+        Tstar = T / self.epsilon_Kelvin
+        numerator = 5 * (pi * self.mass * kB * T)**(1/2)
+        denominator = 16 * pi * self.sigma**2 * self._OmegaViscosity(Tstar)
+        return numerator/denominator
+
+    def self_diffusion_coefficient(self, n, T):
+        """
+        Self-diffusion coefficient.
+        Also called D_11 in other conventions.
+
+        Parameters: n, density in #/m^3
+                    T, temperature in Kelvin
+        
+        Reid, R.C., Prausnitz, J.M., Poling, B.E.,
+        The Properties of Gases and Liquids 4th ed.
+        (McGraw-Hill, New-York, 1987)
+
+        n * D_{AB}(T), Equation (11-3.1)
+
+        Note that in the referenced equation, 
+        n is in the denominator on the r.h.s.
+
+        """
+        Tstar = T / self.epsilon_Kelvin
+        omd = self._OmegaDiffusion(Tstar)
+        numerator = 3 * (4 * pi * kB * T / self.mass)**(1/2)
+        denominator = 16 * pi * n * self.sigma ** 2 * omd
+        return numerator/denominator
 
 class VSSMolecule(DSMCMolecule):
 
