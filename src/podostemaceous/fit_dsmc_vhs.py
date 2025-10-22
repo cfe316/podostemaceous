@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import polyfit
 
 from podostemaceous.constants import kB
 from podostemaceous.molecule import VHSMolecule
@@ -61,7 +60,7 @@ def VHS_model_from_viscosity(visc_func, mass, T_min, T_max, T_ref=0):
     # fit in log - logspace
     x = np.log(TK)
     y = np.log(eta)
-    omega, b = polyfit(x, y, deg=1)
+    omega, b = np.polyfit(x, y, deg=1)
 
     # Calculate d_ref 
     A_best = np.exp(b) # eta = A_best T^omega

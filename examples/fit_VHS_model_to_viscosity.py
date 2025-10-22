@@ -45,18 +45,17 @@ print(vhs_b)
 
 eta_bouledroua_normalized = visc_func_to_fit(TK) / eta_vhs
 
-plt.style.use('seaborn-colorblind')
 fig = plt.figure(figsize=(6, 4))
 ax = fig.add_subplot(1,1,1)
 
 ax.plot(TK, eta_bouledroua_normalized, label='Bouledroua 2005 (fit model)')
 
 ax.set_xlabel('T / K')
-ax.set_ylabel('$\eta / \eta_\mathrm{VHS}$')
+ax.set_ylabel(r'$\eta / \eta_\mathrm{VHS}$')
 plt.title('Viscosity of lithium vapor normalized to VHS model')
-plt.annotate("$D_\mathrm{ref}$: " + str(vhs_b.d_ref), xy=(0.3,0.4), xycoords='axes fraction')
-plt.annotate("$\omega$: " + str(vhs_b.omega), xy=(0.3,0.32), xycoords='axes fraction')
-plt.annotate("$T_\mathrm{ref}$: " + str(vhs_b.t_ref), xy=(0.3,0.24), xycoords='axes fraction')
+plt.annotate(r"$D_\mathrm{ref}$: " + str(vhs_b.d_ref), xy=(0.3,0.4), xycoords='axes fraction')
+plt.annotate(r"$\omega$: " + str(vhs_b.omega), xy=(0.3,0.32), xycoords='axes fraction')
+plt.annotate(r"$T_\mathrm{ref}$: " + str(vhs_b.t_ref), xy=(0.3,0.24), xycoords='axes fraction')
 
 ax.set_xlim([700,1000])
 
