@@ -1,0 +1,11 @@
+[project]
+name = "podostemaceous"
+version = "0.1.0"
+description = "For computing some characteristics of DSMC simulations and the particles in them."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "scipy>=1.16.2",
+]
